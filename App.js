@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import FeedScreen from "./src/screens/FeedScreen";
 import ToolsScreen from "./src/screens/ToolsScreen";
@@ -13,6 +21,7 @@ const TABS = [
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("feed");
+  const isDark = activeTab === "feed";
 
   const renderScreen = () => {
     switch (activeTab) {
@@ -28,17 +37,49 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? "#0f172a" : "#4f46e5" }
+      ]}
+    >
       <ExpoStatusBar style="light" />
 
-      <View style={styles.header}>
+      <View
+        style={[
+          styles.header,
+          { backgroundColor: isDark ? "#0f172a" : "#4f46e5" }
+        ]}
+      >
         <Text style={styles.headerBrand}>AI Pulse</Text>
-        <Text style={styles.headerTagline}>Your Daily AI Briefing</Text>
+        <Text
+          style={[
+            styles.headerTagline,
+            { color: isDark ? "#475569" : "#c7d2fe" }
+          ]}
+        >
+          Your Daily AI Briefing
+        </Text>
       </View>
 
-      <View style={styles.body}>{renderScreen()}</View>
+      <View
+        style={[
+          styles.body,
+          { backgroundColor: isDark ? "#0f172a" : "#f1f5f9" }
+        ]}
+      >
+        {renderScreen()}
+      </View>
 
-      <View style={styles.tabBar}>
+      <View
+        style={[
+          styles.tabBar,
+          isDark && {
+            backgroundColor: "#0f172a",
+            borderTopColor: "#1e293b"
+          }
+        ]}
+      >
         {TABS.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
@@ -50,17 +91,26 @@ export default function App() {
               <View
                 style={[
                   styles.tabIconWrap,
+                  isDark && { backgroundColor: "#1e293b" },
                   isActive && styles.tabIconWrapActive
                 ]}
               >
                 <Text
-                  style={[styles.tabIcon, isActive && styles.tabIconActive]}
+                  style={[
+                    styles.tabIcon,
+                    isDark && { color: "#475569" },
+                    isActive && styles.tabIconActive
+                  ]}
                 >
                   {tab.icon}
                 </Text>
               </View>
               <Text
-                style={[styles.tabLabel, isActive && styles.tabLabelActive]}
+                style={[
+                  styles.tabLabel,
+                  isDark && { color: "#475569" },
+                  isActive && styles.tabLabelActive
+                ]}
               >
                 {tab.label}
               </Text>
