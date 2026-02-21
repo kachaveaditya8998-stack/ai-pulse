@@ -34,20 +34,56 @@ const RSS_FEEDS = [
   "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
 ];
 
-const stripHtml = (html) => {
-  if (!html) return "";
-  return html
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
-    .replace(/<[^>]*>/g, "")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
-    .replace(/&nbsp;/g, " ")
-    .trim();
+// ── Robust HTML entity + tag decoder ──────────────────────────────────
+const NAMED_ENTITIES = {
+  amp: "&", lt: "<", gt: ">", quot: '"', apos: "'",
+  nbsp: " ", ndash: "\u2013", mdash: "\u2014",
+  lsquo: "\u2018", rsquo: "\u2019", sbquo: "\u201A",
+  ldquo: "\u201C", rdquo: "\u201D", bdquo: "\u201E",
+  bull: "\u2022", hellip: "\u2026", prime: "\u2032",
+  Prime: "\u2033", trade: "\u2122", copy: "\u00A9", reg: "\u00AE",
+  euro: "\u20AC", pound: "\u00A3", yen: "\u00A5", cent: "\u00A2",
+  frac12: "\u00BD", frac14: "\u00BC", frac34: "\u00BE",
+  times: "\u00D7", divide: "\u00F7", deg: "\u00B0",
+  laquo: "\u00AB", raquo: "\u00BB"
 };
 
+const decodeEntities = (text) => {
+  if (!text) return "";
+  return text
+    // Numeric decimal entities: &#8217; → character
+    .replace(/&#(\d+);/g, (_, code) => {
+      const n = parseInt(code, 10);
+      return n > 0 ? String.fromCharCode(n) : "";
+    })
+    // Numeric hex entities: &#x2019; → character
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => {
+      const n = parseInt(hex, 16);
+      return n > 0 ? String.fromCharCode(n) : "";
+    })
+    // Named entities: &amp; &rsquo; etc.
+    .replace(/&([a-zA-Z]+);/g, (full, name) => {
+      return NAMED_ENTITIES[name] || full;
+    });
+};
+
+const cleanText = (html) => {
+  if (!html) return "";
+  let text = html;
+  // Unwrap CDATA
+  text = text.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1");
+  // Remove all HTML tags
+  text = text.replace(/<[^>]*>/g, " ");
+  // Decode all entities
+  text = decodeEntities(text);
+  // Collapse whitespace
+  text = text.replace(/\s+/g, " ").trim();
+  // Remove stray leftover artifacts (orphan numbers, random # symbols)
+  text = text.replace(/\s#\s/g, " ").replace(/\s#+$/g, "");
+  return text;
+};
+
+// ── XML tag extractor ─────────────────────────────────────────────────
 const extractTag = (xml, tag) => {
   const cdataPattern = new RegExp(
     `<${tag}>[\\s]*<!\\[CDATA\\[([\\s\\S]*?)\\]\\]>[\\s]*</${tag}>`
@@ -59,18 +95,40 @@ const extractTag = (xml, tag) => {
   return plainMatch ? plainMatch[1].trim() : "";
 };
 
+// ── Image extractor — tries every common RSS image location ───────────
 const extractImage = (xml) => {
-  const mediaMatch = xml.match(/<media:content[^>]*url="([^"]+)"[^>]*>/);
-  if (mediaMatch) return mediaMatch[1];
-  const mediaThumbnail = xml.match(/<media:thumbnail[^>]*url="([^"]+)"[^>]*>/);
-  if (mediaThumbnail) return mediaThumbnail[1];
-  const enclosure = xml.match(/<enclosure[^>]*url="([^"]+)"[^>]*type="image[^"]*"[^>]*>/);
+  // 1. media:content with url
+  const mediaContent = xml.match(/<media:content[^>]*url=["']([^"']+)["'][^>]*>/);
+  if (mediaContent && isImageUrl(mediaContent[1])) return mediaContent[1];
+  // 2. media:thumbnail
+  const mediaThumb = xml.match(/<media:thumbnail[^>]*url=["']([^"']+)["'][^>]*>/);
+  if (mediaThumb) return mediaThumb[1];
+  // 3. enclosure with image type
+  const enclosure = xml.match(/<enclosure[^>]*url=["']([^"']+)["'][^>]*type=["']image[^"']*["'][^>]*>/);
   if (enclosure) return enclosure[1];
-  const imgTag = xml.match(/<img[^>]*src="([^"]+)"[^>]*>/);
-  if (imgTag) return imgTag[1];
+  // Also check enclosure where type comes before url
+  const enclosure2 = xml.match(/<enclosure[^>]*type=["']image[^"']*["'][^>]*url=["']([^"']+)["'][^>]*>/);
+  if (enclosure2) return enclosure2[1];
+  // 4. <img> tag inside description or content:encoded
+  const imgTag = xml.match(/<img[^>]*src=["']([^"']+)["'][^>]*>/);
+  if (imgTag && isImageUrl(imgTag[1])) return imgTag[1];
+  // 5. og:image or featured image in content
+  const featuredImg = xml.match(/https?:\/\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)(?:\?[^\s"'<>]*)?/i);
+  if (featuredImg) return featuredImg[0];
   return null;
 };
 
+const isImageUrl = (url) => {
+  if (!url) return false;
+  // Must look like an image URL (not a video, script, etc.)
+  return /\.(jpg|jpeg|png|webp|gif)/i.test(url) ||
+    url.includes("/image") ||
+    url.includes("wp-content/uploads") ||
+    url.includes("cdn") ||
+    url.includes("img");
+};
+
+// ── Source name from link ─────────────────────────────────────────────
 const extractSource = (link) => {
   if (!link) return "AI News";
   try {
@@ -79,12 +137,14 @@ const extractSource = (link) => {
     if (host.includes("theverge")) return "The Verge";
     if (host.includes("wired")) return "Wired";
     if (host.includes("arstechnica")) return "Ars Technica";
+    if (host.includes("venturebeat")) return "VentureBeat";
     return host.split(".")[0].charAt(0).toUpperCase() + host.split(".")[0].slice(1);
   } catch {
     return "AI News";
   }
 };
 
+// ── RSS parser ────────────────────────────────────────────────────────
 const parseRSS = (xml) => {
   const items = [];
   const itemRegex = /<item>([\s\S]*?)<\/item>/g;
@@ -93,52 +153,36 @@ const parseRSS = (xml) => {
 
   while ((match = itemRegex.exec(xml)) !== null) {
     const block = match[1];
-    const title = stripHtml(extractTag(block, "title"));
-    const link = extractTag(block, "link");
+    const title = cleanText(extractTag(block, "title"));
+    const link = extractTag(block, "link").replace(/<[^>]*>/g, "").trim();
     const pubDate = extractTag(block, "pubDate");
-    const description = stripHtml(extractTag(block, "description"));
     const image = extractImage(block);
-    if (title) {
-      items.push({
-        title,
-        link,
-        pubDate,
-        description: description.substring(0, 160),
-        image,
-        source: extractSource(link)
-      });
+    if (title && title.length > 5) {
+      items.push({ title, link, pubDate, image, source: extractSource(link) });
     }
   }
 
   while ((match = entryRegex.exec(xml)) !== null) {
     const block = match[1];
-    const title = stripHtml(extractTag(block, "title"));
-    const linkMatch = block.match(/<link[^>]*href="([^"]*)"[^>]*\/?>/);
+    const title = cleanText(extractTag(block, "title"));
+    const linkMatch = block.match(/<link[^>]*href=["']([^"']*)["'][^>]*\/?>/);
     const link = linkMatch ? linkMatch[1] : extractTag(block, "link");
     const pubDate = extractTag(block, "published") || extractTag(block, "updated");
-    const description = stripHtml(extractTag(block, "summary") || extractTag(block, "content"));
     const image = extractImage(block);
-    if (title) {
-      items.push({
-        title,
-        link,
-        pubDate,
-        description: description.substring(0, 160),
-        image,
-        source: extractSource(link)
-      });
+    if (title && title.length > 5) {
+      items.push({ title, link, pubDate, image, source: extractSource(link) });
     }
   }
   return items;
 };
 
+// ── Date formatter ────────────────────────────────────────────────────
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
   try {
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return "";
-    const now = new Date();
-    const diffHrs = Math.floor((now - d) / (1000 * 60 * 60));
+    const diffHrs = Math.floor((new Date() - d) / (1000 * 60 * 60));
     if (diffHrs < 1) return "Just now";
     if (diffHrs < 24) return `${diffHrs}h ago`;
     const diffDays = Math.floor(diffHrs / 24);
@@ -150,6 +194,7 @@ const formatDate = (dateStr) => {
   }
 };
 
+// ── Swipeable Card ────────────────────────────────────────────────────
 function SwipeableCard({ article, index, isTop, onSwipedLeft, onSwipedRight }) {
   const position = useRef(new Animated.ValueXY()).current;
   const [imgFailed, setImgFailed] = useState(false);
@@ -158,7 +203,8 @@ function SwipeableCard({ article, index, isTop, onSwipedLeft, onSwipedRight }) {
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => isTop,
-      onMoveShouldSetPanResponder: (_, g) => isTop && (Math.abs(g.dx) > 5 || Math.abs(g.dy) > 5),
+      onMoveShouldSetPanResponder: (_, g) =>
+        isTop && (Math.abs(g.dx) > 5 || Math.abs(g.dy) > 5),
       onPanResponderMove: Animated.event(
         [null, { dx: position.x, dy: position.y }],
         { useNativeDriver: false }
@@ -207,7 +253,11 @@ function SwipeableCard({ article, index, isTop, onSwipedLeft, onSwipedRight }) {
 
   const cardStyle = isTop
     ? {
-        transform: [{ translateX: position.x }, { translateY: position.y }, { rotate }],
+        transform: [
+          { translateX: position.x },
+          { translateY: position.y },
+          { rotate }
+        ],
         zIndex: 10
       }
     : {
@@ -240,17 +290,21 @@ function SwipeableCard({ article, index, isTop, onSwipedLeft, onSwipedRight }) {
       )}
 
       <LinearGradient
-        colors={["transparent", "rgba(0,0,0,0.3)", "rgba(0,0,0,0.85)"]}
-        locations={[0, 0.4, 1]}
+        colors={["transparent", "rgba(0,0,0,0.15)", "rgba(0,0,0,0.92)"]}
+        locations={[0, 0.35, 1]}
         style={styles.overlay}
       />
 
       {isTop && (
         <>
-          <Animated.View style={[styles.actionLabel, styles.readLabel, { opacity: readOpacity }]}>
+          <Animated.View
+            style={[styles.actionLabel, styles.readLabel, { opacity: readOpacity }]}
+          >
             <Text style={styles.readLabelText}>READ</Text>
           </Animated.View>
-          <Animated.View style={[styles.actionLabel, styles.skipLabel, { opacity: skipOpacity }]}>
+          <Animated.View
+            style={[styles.actionLabel, styles.skipLabel, { opacity: skipOpacity }]}
+          >
             <Text style={styles.skipLabelText}>SKIP</Text>
           </Animated.View>
         </>
@@ -268,22 +322,20 @@ function SwipeableCard({ article, index, isTop, onSwipedLeft, onSwipedRight }) {
       </View>
 
       <View style={styles.cardBottom}>
-        <Text style={styles.cardTitle} numberOfLines={3}>
+        <Text style={styles.cardTitle} numberOfLines={4}>
           {article.title}
         </Text>
-        {article.description ? (
-          <Text style={styles.cardDesc} numberOfLines={2}>
-            {article.description}
-          </Text>
-        ) : null}
         <View style={styles.swipeHintRow}>
-          <Text style={styles.swipeHint}>Swipe right to read  /  left to skip</Text>
+          <Text style={styles.swipeHint}>
+            Swipe right to read  /  left to skip
+          </Text>
         </View>
       </View>
     </Animated.View>
   );
 }
 
+// ── Main Feed Screen ──────────────────────────────────────────────────
 export default function FeedScreen() {
   const [articles, setArticles] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -295,13 +347,17 @@ export default function FeedScreen() {
       setError(false);
       const results = await Promise.allSettled(
         RSS_FEEDS.map((url) =>
-          fetch(url).then((res) => res.text()).then(parseRSS)
+          fetch(url)
+            .then((res) => res.text())
+            .then(parseRSS)
         )
       );
       const allArticles = results
         .filter((r) => r.status === "fulfilled")
         .flatMap((r) => r.value);
-      allArticles.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
+      allArticles.sort(
+        (a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0)
+      );
       setArticles(allArticles);
       setCurrentIndex(0);
       if (allArticles.length === 0) setError(true);
@@ -340,10 +396,15 @@ export default function FeedScreen() {
       <View style={styles.center}>
         <Text style={styles.errorEmoji}>!</Text>
         <Text style={styles.errorTitle}>No connection</Text>
-        <Text style={styles.errorSub}>Check your internet and try again.</Text>
+        <Text style={styles.errorSub}>
+          Check your internet and try again.
+        </Text>
         <TouchableOpacity
           style={styles.retryBtn}
-          onPress={() => { setLoading(true); fetchNews(); }}
+          onPress={() => {
+            setLoading(true);
+            fetchNews();
+          }}
         >
           <Text style={styles.retryText}>Retry</Text>
         </TouchableOpacity>
@@ -363,7 +424,10 @@ export default function FeedScreen() {
         </Text>
         <TouchableOpacity
           style={styles.refreshBtn}
-          onPress={() => { setLoading(true); fetchNews(); }}
+          onPress={() => {
+            setLoading(true);
+            fetchNews();
+          }}
         >
           <Text style={styles.refreshText}>Load New Stories</Text>
         </TouchableOpacity>
@@ -382,23 +446,28 @@ export default function FeedScreen() {
       </View>
 
       <View style={styles.cardContainer}>
-        {visibleCards.map((article, i) => (
-          <SwipeableCard
-            key={`${article.title}-${currentIndex + i}`}
-            article={article}
-            index={currentIndex + i}
-            isTop={i === 0}
-            onSwipedLeft={handleSwipeLeft}
-            onSwipedRight={handleSwipeRight}
-          />
-        )).reverse()}
+        {visibleCards
+          .map((article, i) => (
+            <SwipeableCard
+              key={`${article.title}-${currentIndex + i}`}
+              article={article}
+              index={currentIndex + i}
+              isTop={i === 0}
+              onSwipedLeft={handleSwipeLeft}
+              onSwipedRight={handleSwipeRight}
+            />
+          ))
+          .reverse()}
       </View>
 
       <View style={styles.bottomActions}>
         <TouchableOpacity style={styles.actionBtnSkip} onPress={handleSwipeLeft}>
           <Text style={styles.actionBtnSkipText}>Skip</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtnRead} onPress={handleSwipeRight}>
+        <TouchableOpacity
+          style={styles.actionBtnRead}
+          onPress={handleSwipeRight}
+        >
           <Text style={styles.actionBtnReadText}>Read Article</Text>
         </TouchableOpacity>
       </View>
@@ -406,6 +475,7 @@ export default function FeedScreen() {
   );
 }
 
+// ── Styles ────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -469,10 +539,7 @@ const styles = StyleSheet.create({
     borderRadius: 14
   },
   refreshText: { color: "#fff", fontWeight: "700", fontSize: 16 },
-  counterRow: {
-    paddingTop: 12,
-    paddingBottom: 8
-  },
+  counterRow: { paddingTop: 12, paddingBottom: 8 },
   counterText: {
     color: "#64748b",
     fontSize: 13,
@@ -551,8 +618,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.2)",
     paddingHorizontal: 12,
     paddingVertical: 5,
-    borderRadius: 20,
-    backdropFilter: "blur(10px)"
+    borderRadius: 20
   },
   sourceText: {
     color: "#ffffff",
@@ -566,40 +632,28 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 20
   },
-  timeText: {
-    color: "#e2e8f0",
-    fontSize: 12,
-    fontWeight: "600"
-  },
+  timeText: { color: "#e2e8f0", fontSize: 12, fontWeight: "600" },
   cardBottom: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 20,
-    paddingBottom: 22
+    padding: 22,
+    paddingBottom: 24
   },
   cardTitle: {
     color: "#ffffff",
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "800",
-    lineHeight: 30,
-    marginBottom: 8,
-    textShadowColor: "rgba(0,0,0,0.3)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4
+    lineHeight: 33,
+    marginBottom: 14,
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 6
   },
-  cardDesc: {
-    color: "rgba(255,255,255,0.75)",
-    fontSize: 14,
-    lineHeight: 21,
-    marginBottom: 12
-  },
-  swipeHintRow: {
-    alignItems: "center"
-  },
+  swipeHintRow: { alignItems: "center" },
   swipeHint: {
-    color: "rgba(255,255,255,0.4)",
+    color: "rgba(255,255,255,0.35)",
     fontSize: 12,
     fontWeight: "500"
   },
@@ -619,11 +673,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#334155"
   },
-  actionBtnSkipText: {
-    color: "#94a3b8",
-    fontWeight: "700",
-    fontSize: 16
-  },
+  actionBtnSkipText: { color: "#94a3b8", fontWeight: "700", fontSize: 16 },
   actionBtnRead: {
     flex: 1.5,
     backgroundColor: "#4f46e5",
@@ -631,9 +681,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center"
   },
-  actionBtnReadText: {
-    color: "#ffffff",
-    fontWeight: "700",
-    fontSize: 16
-  }
+  actionBtnReadText: { color: "#ffffff", fontWeight: "700", fontSize: 16 }
 });
