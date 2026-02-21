@@ -1,188 +1,219 @@
 export const dailyTips = [
   {
     id: "1",
-    title: "The 80/20 AI Rule",
-    tip: "Let AI handle the first 80% of any writing task — the blank page, the structure, the rough draft. Spend your time on the 20% that needs your personal expertise, judgment, and voice. This flips the painful part of writing from 'starting' to 'polishing.'",
-    category: "Productivity"
+    title: "The 80/20 AI Writing Rule",
+    tip: "Let AI handle the first 80% of any writing task — the blank page, the structure, the rough draft. Spend your time on the 20% that needs your personal expertise, judgment, and voice. The most painful part of writing is starting. AI eliminates that pain entirely.",
+    source: "Superhuman Blog",
+    category: "Writing"
   },
   {
     id: "2",
     title: "Summarize Before You Read",
-    tip: "Before reading a long report or article, paste it into an AI tool and ask for a 3-bullet summary. This gives you a mental framework so you read faster and retain more. You'll know what to focus on before you start.",
+    tip: "Before reading a long report, paste it into Claude or ChatGPT and ask for a 3-bullet summary. This gives your brain a framework, so you read faster and retain more. You'll know exactly what to pay attention to before you start. Works for articles, contracts, and whitepapers.",
+    source: "Ben's Bites",
     category: "Research"
   },
   {
     id: "3",
-    title: "The Meeting Multiplier",
-    tip: "After every meeting, spend 60 seconds pasting your notes into AI and asking: 'Extract action items with owners and deadlines.' Share this with attendees immediately. You'll be known as the most organized person in every room.",
+    title: "The 60-Second Meeting Hack",
+    tip: "After every meeting, spend 60 seconds pasting your raw notes into AI and asking: 'Extract action items with owners and deadlines, then write a 3-sentence summary.' Share this with attendees immediately. You'll become the most organized person in every room.",
+    source: "The Rundown AI",
     category: "Meetings"
   },
   {
     id: "4",
     title: "Email in Half the Time",
-    tip: "For routine emails, type 2-3 bullet points of what you want to say, then ask AI to write the full email. Review and send. Most professionals spend 2+ hours daily on email — this can cut that in half.",
+    tip: "For routine emails, jot 2-3 bullet points of what you want to say, then ask AI to write the full email. Review, tweak your voice, and send. The average professional spends 2.5 hours daily on email — this technique can cut that by 40%.",
+    source: "Superhuman Blog",
     category: "Writing"
   },
   {
     id: "5",
-    title: "Learn Any Topic in 15 Minutes",
-    tip: "Ask AI: 'Explain [complex topic] as if I'm smart but know nothing about this field. Use analogies from everyday life.' This works for understanding finance, law, medicine, tech — any domain outside your expertise.",
+    title: "The Expert Translation Trick",
+    tip: "Ask AI: 'Explain [complex topic] as if I'm smart but know nothing about this field. Use analogies from everyday life.' This works brilliantly for understanding finance, legal, medical, or technical domains outside your expertise. You'll sound informed in any room.",
+    source: "TLDR AI",
     category: "Learning"
   },
   {
     id: "6",
-    title: "The Decision Matrix Trick",
-    tip: "Facing a tough decision? Tell AI your options and constraints, then ask it to create a pros/cons matrix and identify what you might be overlooking. AI won't make the decision, but it surfaces blind spots you'd miss alone.",
-    category: "Productivity"
+    title: "Blind Spot Detector for Decisions",
+    tip: "Facing a tough decision? Tell AI your options and constraints, then ask: 'Create a pros/cons matrix and tell me what I might be overlooking.' AI won't make the decision for you, but it reliably surfaces the blind spots you'd miss thinking alone.",
+    source: "Ben's Bites",
+    category: "Strategy"
   },
   {
     id: "7",
     title: "Automate Your Status Updates",
-    tip: "Keep a running doc of what you did each day (even just bullet points). At week's end, paste it into AI and ask for a professional status update organized by project. Never scramble for standup notes again.",
+    tip: "Keep a running doc of daily bullet points (even rough ones). At week's end, paste everything into AI and ask for a professional status update organized by project. Never scramble for standup notes again. Takes 30 seconds, saves 30 minutes.",
+    source: "AI Tool Report",
     category: "Productivity"
   },
   {
     id: "8",
-    title: "The Presentation Shortcut",
-    tip: "Don't start slides from scratch. Write your key message in 5 bullet points, ask AI to expand each into a slide outline with a suggested visual. You'll have a deck structure in 5 minutes instead of 2 hours.",
+    title: "The 5-Minute Presentation Kickstart",
+    tip: "Don't start slides from scratch. Write your key message in 5 bullet points, ask AI to expand each into a slide outline with a suggested visual. Paste the result into Gamma or Canva AI. Full deck structure in 5 minutes instead of 2 hours.",
+    source: "The Rundown AI",
     category: "Design"
   },
   {
     id: "9",
-    title: "Debug Your Own Writing",
-    tip: "After writing something important, ask AI: 'What are the weakest arguments in this? What would a skeptic challenge?' This pressure-tests your work before anyone else sees it. Especially powerful for proposals and strategy docs.",
+    title: "Pressure-Test Your Own Work",
+    tip: "After writing something important, ask AI: 'What are the 3 weakest arguments in this? What would a tough critic challenge?' This stress-tests your thinking before anyone else sees it. Especially powerful for proposals, strategies, and investor decks.",
+    source: "Superhuman Blog",
     category: "Writing"
   },
   {
     id: "10",
-    title: "The Interview Prep Hack",
-    tip: "Whether you're interviewing or being interviewed, paste the job description into AI and ask for the 10 most likely questions and strong answers. For hiring managers: ask AI to generate behavioral questions specific to the role.",
+    title: "The Interview Prep Power Move",
+    tip: "Paste the job description into AI and ask: 'Generate the 10 most likely interview questions, then write strong answers using the STAR method for a candidate with my background in [your field].' Works whether you're interviewing or designing interview questions.",
+    source: "Ben's Bites",
     category: "Career"
   },
   {
     id: "11",
-    title: "Spreadsheet Formulas Instantly",
-    tip: "Stop Googling Excel formulas. Describe what you need in plain English: 'I need a formula that looks up a value in column A and returns the sum of matching values in column C.' AI gives you the exact formula with explanation.",
+    title: "Never Google a Spreadsheet Formula Again",
+    tip: "Describe what you need in plain English: 'A formula that finds all rows where column A is \"Pending\" and sums the matching values in column D.' AI gives you the exact Excel/Sheets formula with an explanation. Works for VLOOKUP, pivot logic, conditional formatting — everything.",
+    source: "TLDR AI",
     category: "Productivity"
   },
   {
     id: "12",
-    title: "Contract and Legal Review",
-    tip: "Before signing any agreement, paste it into AI and ask: 'Highlight unusual clauses, potential risks, and anything I should negotiate.' It's not legal advice, but it flags things you should discuss with your lawyer.",
+    title: "The Contract Red Flag Scanner",
+    tip: "Before signing any agreement, paste it into Claude (it handles long docs best) and ask: 'Highlight unusual clauses, hidden risks, and anything I should negotiate.' It's not legal advice, but it flags exactly what to discuss with your lawyer — saving both time and money.",
+    source: "AI Tool Report",
     category: "Research"
   },
   {
     id: "13",
     title: "The Brainstorm Multiplier",
-    tip: "When brainstorming, first generate your own ideas for 5 minutes. Then share them with AI and say: 'Build on these ideas and add 10 more I haven't thought of.' AI is best at expanding your thinking, not replacing it.",
+    tip: "First, brainstorm your own ideas for 5 minutes (this is critical). Then share them with AI and say: 'Build on these and add 10 ideas I haven't considered.' AI is best at expanding your thinking, not replacing it. Your ideas + AI's breadth = 10x creative output.",
+    source: "The Rundown AI",
     category: "Creativity"
   },
   {
     id: "14",
-    title: "Translate Jargon Instantly",
-    tip: "Got a technical email from engineering, legal, or finance? Paste it into AI and ask: 'Rewrite this for a non-specialist audience.' Works the other way too — translate your plain-language request into domain-specific terms.",
+    title: "Instant Jargon Translation",
+    tip: "Got a technical email from engineering, legal, or finance that reads like another language? Paste it into AI: 'Rewrite this for a non-specialist audience in 3 simple paragraphs.' Works the other way too — translate your plain-language request into domain-specific terms.",
+    source: "Superhuman Blog",
     category: "Communication"
   },
   {
     id: "15",
-    title: "Weekly Learning Ritual",
-    tip: "Every Monday, ask AI: 'What are the 3 most important AI developments from last week that affect [your industry]?' In 5 minutes, you stay more informed than 95% of your peers. Consistency beats intensity.",
+    title: "The Monday Morning AI Briefing",
+    tip: "Every Monday, ask Perplexity: 'What are the 3 most important AI developments from last week that affect [your industry]?' Five minutes, every week, consistently. In 3 months, you'll be the AI-informed person your team turns to for insight.",
+    source: "Ben's Bites",
     category: "Learning"
   },
   {
     id: "16",
-    title: "The Delegation Template",
-    tip: "When delegating tasks, ask AI to help you write clear briefs: include context, expected outcome, timeline, and quality criteria. Vague delegation creates rework. Clear delegation (AI-assisted) creates results.",
+    title: "The Perfect Delegation Brief",
+    tip: "When delegating tasks, ask AI to help write clear briefs: include context, expected outcome, quality criteria, and timeline. Vague delegation creates rework. Clear delegation (AI-assisted) creates results first time. Your team will thank you.",
+    source: "AI Tool Report",
     category: "Management"
   },
   {
     id: "17",
-    title: "Data Storytelling Made Easy",
-    tip: "Paste your data or key metrics into AI and ask: 'What story does this data tell? Write 3 key insights for a non-technical audience.' Turn numbers into narratives that executives actually remember.",
+    title: "Data Storytelling in 60 Seconds",
+    tip: "Paste key metrics or data into AI: 'What story does this data tell? Write 3 insights for a non-technical executive audience.' Numbers bore people. Narratives move people. AI bridges that gap instantly — turning spreadsheets into stories that get remembered.",
+    source: "The Rundown AI",
     category: "Productivity"
   },
   {
     id: "18",
-    title: "The Follow-Up Formula",
-    tip: "After sending a proposal or important email with no response, ask AI to write a follow-up that's friendly but persistent. Specify the tone and context. Most deals are won in the follow-up — AI makes it effortless.",
+    title: "The Warm Follow-Up Formula",
+    tip: "No reply to your important email? Ask AI: 'Write a follow-up that's friendly but persistent, referencing [context]. Tone: warm but professional.' Most deals, opportunities, and partnerships are won in the follow-up. AI makes the awkward second email effortless.",
+    source: "Superhuman Blog",
     category: "Writing"
   },
   {
     id: "19",
-    title: "Process Documentation Hack",
-    tip: "Record yourself explaining a process out loud (use your phone). Transcribe it with Otter or Whisper, then ask AI to turn the transcript into step-by-step documentation. Document processes in minutes, not hours.",
+    title: "Voice-to-Documentation Pipeline",
+    tip: "Explain a process out loud while recording on your phone (2-3 minutes). Transcribe it with Otter.ai, then paste the transcript into AI: 'Turn this into professional step-by-step documentation.' You just documented a process in 5 minutes that would normally take an hour.",
+    source: "TLDR AI",
     category: "Productivity"
   },
   {
     id: "20",
     title: "The Feedback Rewriter",
-    tip: "Struggling to give tough feedback? Write what you honestly want to say, then ask AI: 'Rewrite this feedback to be direct but constructive and kind.' You keep the honesty while improving the delivery.",
+    tip: "Struggling to give tough feedback? Write what you honestly want to say (raw and unfiltered). Then ask AI: 'Rewrite this to be direct, constructive, and kind. Keep the honesty but improve the delivery.' You keep the truth. AI adds the tact.",
+    source: "Ben's Bites",
     category: "Communication"
   },
   {
     id: "21",
-    title: "Competitive Intelligence on Autopilot",
-    tip: "Ask AI to analyze a competitor's recent announcements, job postings, or public content and identify their likely strategy shifts. Job postings especially reveal where companies are investing next.",
-    category: "Research"
+    title: "Decode Competitors Through Job Posts",
+    tip: "Paste a competitor's recent job listings into AI and ask: 'Based on these roles, what is this company likely building or investing in next?' Job postings are public strategy documents hiding in plain sight. AI reads between the lines faster than any analyst.",
+    source: "The Rundown AI",
+    category: "Strategy"
   },
   {
     id: "22",
     title: "The Calendar Audit",
-    tip: "Export your calendar for the past month and paste meeting titles into AI. Ask: 'Categorize these meetings and tell me where I'm spending most of my time. Suggest which meetings I should decline or delegate.'",
+    tip: "List your meetings from last month and paste them into AI: 'Categorize these by type and tell me where I'm spending too much time. Which meetings could I decline, delegate, or make async?' Most professionals discover 25-30% of meetings are unnecessary.",
+    source: "Superhuman Blog",
     category: "Productivity"
   },
   {
     id: "23",
-    title: "Build Your AI Toolkit",
-    tip: "Don't try every AI tool. Pick 3 that solve your biggest pain points and learn them deeply. One for writing, one for meetings, one for your specific domain. Mastery of 3 tools beats surface knowledge of 30.",
+    title: "Master 3 Tools, Not 30",
+    tip: "The biggest productivity mistake with AI: trying every new tool. Instead, pick 3 that solve your biggest pain points and learn them deeply. One for writing, one for meetings, one for your domain. Mastery of 3 tools beats surface knowledge of 30 every single time.",
+    source: "AI Tool Report",
     category: "Strategy"
   },
   {
     id: "24",
     title: "The Onboarding Accelerator",
-    tip: "Starting a new role or project? Paste all documentation into AI and have a conversation: ask questions, request summaries, get explanations of acronyms. You'll ramp up in days instead of weeks.",
+    tip: "Starting a new role or project? Dump all documentation into Claude and have a conversation: ask questions, request summaries, get acronyms explained. You'll ramp up in 3 days instead of 3 weeks. First impressions compound — show up informed from day one.",
+    source: "Ben's Bites",
     category: "Career"
   },
   {
     id: "25",
-    title: "Smart Meeting Prep",
-    tip: "Before any important meeting, give AI the context and ask: 'What are the 5 things I should prepare for? What questions might come up?' Walking in prepared makes you look sharp and builds trust.",
+    title: "Walk Into Every Meeting Prepared",
+    tip: "Before any important meeting, give AI the agenda and context: 'What are 5 things I should prepare for? What tough questions might come up? What data should I have ready?' Ten minutes of AI-powered prep makes you look more prepared than people who spent an hour.",
+    source: "TLDR AI",
     category: "Meetings"
   },
   {
     id: "26",
-    title: "The SOC Report Decoder",
-    tip: "Got a dense technical, financial, or compliance report? Ask AI: 'Read this report and give me the 5 things that actually matter for my role as [your role].' Context-specific summaries beat generic ones.",
+    title: "The Report Decoder",
+    tip: "Got a dense 50-page report? Ask AI: 'Read this and give me the 5 things that actually matter for someone in my role as [your title].' Context-specific summaries beat generic ones. AI filters the noise so you can act on what's relevant to you specifically.",
+    source: "The Rundown AI",
     category: "Research"
   },
   {
     id: "27",
-    title: "Negotiate with Confidence",
-    tip: "Before any negotiation (salary, vendor, contract), describe the situation to AI and ask for the strongest arguments for your position, likely counterarguments, and response strategies. Preparation wins negotiations.",
+    title: "AI-Powered Negotiation Prep",
+    tip: "Before any negotiation, describe the situation to AI: 'Give me the 3 strongest arguments for my position, the likely counterarguments, and how to respond to each.' Preparation wins negotiations. AI gives you a complete playbook in 5 minutes.",
+    source: "Superhuman Blog",
     category: "Career"
   },
   {
     id: "28",
-    title: "The Template Factory",
-    tip: "Create reusable AI prompts for your recurring tasks. Save them in a note. A great prompt used 50 times is worth more than 50 mediocre one-off prompts. Build a personal library of what works.",
+    title: "Build a Prompt Library",
+    tip: "When you write an AI prompt that works great, save it in a note with a label. A library of 20 proven prompts is worth more than 200 improvised ones. Reuse your best prompts weekly. Treat them like email templates — write once, use forever.",
+    source: "Ben's Bites",
     category: "Productivity"
   },
   {
     id: "29",
     title: "Fix Bad Meetings Forever",
-    tip: "Paste your recurring meeting agenda into AI and ask: 'Redesign this meeting to be 50% shorter while covering the same ground. Suggest what can be async.' Most meetings can be half their current length.",
+    tip: "Paste your recurring meeting agenda into AI: 'Redesign this meeting to be 50% shorter while covering the same ground. What can be async? What needs real-time discussion?' Most hour-long meetings can be 25 minutes with a better structure.",
+    source: "AI Tool Report",
     category: "Meetings"
   },
   {
     id: "30",
-    title: "The Personal Brand Builder",
-    tip: "Ask AI to analyze your LinkedIn posts or writing samples and identify your unique voice and themes. Then use it to generate content ideas that amplify your expertise. Consistency + AI = visible expertise.",
-    category: "Career"
+    title: "Write Once, Adapt Everywhere",
+    tip: "Write one core document, then ask AI to rewrite it for different audiences: 'Executive version (3 bullets)', 'Technical team version (detailed)', 'Client version (friendly and clear).' One piece of thinking, three perfect outputs. This is the real AI multiplier.",
+    source: "The Rundown AI",
+    category: "Writing"
   },
   {
     id: "31",
-    title: "Rewrite for Any Audience",
-    tip: "Write once, adapt many times. Take any document and ask AI to rewrite it for different audiences: executives (brief), technical team (detailed), clients (friendly). One piece of thinking, multiple outputs.",
-    category: "Writing"
+    title: "The Personal Brand Compound Effect",
+    tip: "Share one AI insight you learned this week on LinkedIn. Just one. Every week. Ask AI to help you draft it in your voice. In 6 months, you'll be the person in your network known for being ahead of the curve on AI. Consistency plus AI equals visible expertise.",
+    source: "TLDR AI",
+    category: "Career"
   }
 ];
